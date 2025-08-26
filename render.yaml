@@ -26,10 +26,15 @@ services:
   env: python
   schedule: "0 7 * * *"     # daily 7:00 AM America/Chicago
   buildCommand: pip install -r requirements.txt
-  startCommand: python -c "import requests,os; requests.post(os.environ['BASE_URL']+'/sync', timeout=120)"
+  startCommand: python -c "import os,requests;requests.post(f'http://{os.environ[\"SYNC_HOST\"]}:{os.environ[\"SYNC_PORT\"]}/sync', timeout=120)"
   envVars:
-  - key: BASE_URL
+  - key: SYNC_HOST
     fromService:
       name: canvas-sync-web
       type: web
-      property: url
+      property: host
+  - key: SYNC_PORT
+    fromService:
+      name: canvas-sync-web
+      type: web
+      property: port
