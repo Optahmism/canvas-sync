@@ -1,0 +1,35 @@
+services:
+- type: web
+  name: canvas-sync-web
+  env: python
+  plan: free
+  buildCommand: pip install -r requirements.txt
+  startCommand: gunicorn app:app --preload --bind 0.0.0.0:10000
+  envVars:
+  - key: CANVAS_BASE_URL
+    sync: false
+  - key: CANVAS_TOKEN
+    sync: false
+  - key: CANVAS_COURSE_IDS
+    sync: false
+  - key: SHEET_ID
+    sync: false
+  - key: CALENDAR_ID
+    sync: false
+  - key: GOOGLE_CREDENTIALS_JSON_B64
+    sync: false
+  - key: TZ
+    value: America/Chicago
+
+- type: cron
+  name: canvas-sync-cron
+  env: python
+  schedule: "0 7 * * *"     # daily 7:00 AM America/Chicago
+  buildCommand: pip install -r requirements.txt
+  startCommand: python -c "import requests,os; requests.post(os.environ['BASE_URL']+'/sync', timeout=120)"
+  envVars:
+  - key: BASE_URL
+    fromService:
+      name: canvas-sync-web
+      type: web
+      property: url
