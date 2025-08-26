@@ -4,7 +4,7 @@ services:
   env: python
   plan: free
   buildCommand: pip install -r requirements.txt
-  startCommand: gunicorn app:app --preload --bind 0.0.0.0:10000
+  startCommand: gunicorn app:app --preload --bind 0.0.0.0:$PORT
   envVars:
   - key: CANVAS_BASE_URL
     sync: false
@@ -24,7 +24,7 @@ services:
 - type: cron
   name: canvas-sync-cron
   env: python
-  schedule: "0 7 * * *"     # daily 7:00 AM America/Chicago
+  schedule: "0 7 * * *"
   buildCommand: pip install -r requirements.txt
   startCommand: python -c "import os,requests;requests.post(f'http://{os.environ[\"SYNC_HOST\"]}:{os.environ[\"SYNC_PORT\"]}/sync', timeout=120)"
   envVars:
